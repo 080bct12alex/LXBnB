@@ -5,6 +5,8 @@ import { param, validationResult } from "express-validator";
 import Stripe from "stripe";
 import verifyToken from "../middleware/auth";
 
+import User from "../models/user"; //  user model import for router.post("/:hotelId/bookings/payment-intent", verifyToken, 
+
 const stripe = new Stripe(process.env.STRIPE_API_KEY as string);
 
 const router = express.Router();
@@ -86,7 +88,7 @@ router.get(
   }
 );
 
-router.post(
+router.post(      // updated for stripe integration
   "/:hotelId/bookings/payment-intent",
   verifyToken,
   async (req: Request, res: Response) => {
@@ -98,15 +100,30 @@ router.post(
       return res.status(400).json({ message: "Hotel not found" });
     }
 
+    // fetch user from DB
+  const user = await User.findById(req.userId);
+  if (!user) return res.status(400).json({ message: "User not found" });
+
     const totalCost = hotel.pricePerNight * numberOfNights;
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: totalCost * 100,
-      currency: "gbp",
+      currency: "usd",
+      payment_method_types: ["card"], // frontend collects card
+      description: `Booking for Hotel ${hotel.name} by User ${user.firstName} ${user.lastName}`,
       metadata: {
         hotelId,
         userId: req.userId,
-      },
+        },
+      shipping: {
+      name: ` ${user.firstName} ${user.lastName} Guest of Hotel ${hotel.name} `,// ✅ sender name but in stripe its called recipent
+      address: {
+      line1: "Kathmandu", // required by Stripe, you can leave line1 as placeholder if no real address
+       //city: "Kathmandu",    // optional
+       //postal_code: "44600",
+      country: "NP", 
+    },
+     },
     });
 
     if (!paymentIntent.client_secret) {

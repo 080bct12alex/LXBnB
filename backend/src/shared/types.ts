@@ -51,3 +51,6 @@ export type PaymentIntentResponse = {
   clientSecret: string;
   totalCost: number;
 };
+
+
+

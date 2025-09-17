@@ -76,6 +76,11 @@ const BookingForm = ({ currentUser, paymentIntent }: Props) => {
       },
     });
 
+    if (result.error) {      // added when cant find error in stripe integration while confirm payment
+  showToast({ message: result.error.message || "Payment failed", type: "ERROR" });
+  return;
+}
+
     if (result.paymentIntent?.status === "succeeded") {
       bookRoom({ ...formData, paymentIntentId: result.paymentIntent.id });
     }
@@ -125,7 +130,7 @@ const BookingForm = ({ currentUser, paymentIntent }: Props) => {
 
         <div className="bg-blue-200 p-4 rounded-md">
           <div className="font-semibold text-lg">
-            Total Cost: £{paymentIntent.totalCost.toFixed(2)}
+            Total Cost: ${paymentIntent.totalCost.toFixed(2)}
           </div>
           <div className="text-xs">Includes taxes and charges</div>
         </div>
