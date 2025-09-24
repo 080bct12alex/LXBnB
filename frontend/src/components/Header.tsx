@@ -22,6 +22,9 @@ const Header = () => {
           {isLoggedIn ? (
             <>
               <li className="text-primary font-bold hover:text-secondary transition-colors duration-300">
+                <Link to="/">Home</Link>
+              </li>
+              <li className="text-primary font-bold hover:text-secondary transition-colors duration-300">
                 <Link to="/my-bookings">My Bookings</Link>
               </li>
               <li className="text-primary font-bold hover:text-secondary transition-colors duration-300">
@@ -57,6 +60,9 @@ const Header = () => {
           <ul className="h-full w-full text-center pt-12">
             {isLoggedIn ? (
               <>
+              <li className="text-2xl py-8">
+                <Link to="/">Home</Link>
+              </li>
               <li className="text-2xl py-8">
                 <Link to="/my-bookings">My Bookings</Link>
               </li>
