@@ -8,17 +8,17 @@ import Layout from "./layouts/Layout";
 import Register from "./pages/Register";
 import SignIn from "./pages/SignIn";
 import AddHotel from "./pages/AddHotel";
-import { useAppContext } from "./contexts/AppContext";
 import MyHotels from "./pages/MyHotels";
 import EditHotel from "./pages/EditHotel";
 import Search from "./pages/Search";
 import Detail from "./pages/Detail";
 import Booking from "./pages/Booking";
 import MyBookings from "./pages/MyBookings";
+import MyHotelBookings from "./pages/MyHotelBookings"; // Import MyHotelBookings
 import Home from "./pages/Home";
+import ProtectedRoute from "./components/ProtectedRoute"; // Import ProtectedRoute
 
 const App = () => {
-  const { isLoggedIn } = useAppContext();
   return (
     <Router>
       <Routes>
@@ -63,51 +63,68 @@ const App = () => {
           }
         />
 
-        {isLoggedIn && (
-          <>
-            <Route
-              path="/hotel/:hotelId/booking"
-              element={
-                <Layout>
-                  <Booking />
-                </Layout>
-              }
-            />
+        <Route
+          path="/hotel/:hotelId/booking"
+          element={(
+            <ProtectedRoute allowedRoles={["guest", "hotel-owner"]}>
+              <Layout>
+                <Booking />
+              </Layout>
+            </ProtectedRoute>
+          )}
+        />
 
-            <Route
-              path="/add-hotel"
-              element={
-                <Layout>
-                  <AddHotel />
-                </Layout>
-              }
-            />
-            <Route
-              path="/edit-hotel/:hotelId"
-              element={
-                <Layout>
-                  <EditHotel />
-                </Layout>
-              }
-            />
-            <Route
-              path="/my-hotels"
-              element={
-                <Layout>
-                  <MyHotels />
-                </Layout>
-              }
-            />
-            <Route
-              path="/my-bookings"
-              element={
-                <Layout>
-                  <MyBookings />
-                </Layout>
-              }
-            />
-          </>
-        )}
+        <Route
+          path="/add-hotel"
+          element={(
+            <ProtectedRoute allowedRoles={["hotel-owner"]}>
+              <Layout>
+                <AddHotel />
+              </Layout>
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/edit-hotel/:hotelId"
+          element={(
+            <ProtectedRoute allowedRoles={["hotel-owner"]}>
+              <Layout>
+                <EditHotel />
+              </Layout>
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/my-hotels"
+          element={(
+            <ProtectedRoute allowedRoles={["hotel-owner"]}>
+              <Layout>
+                <MyHotels />
+              </Layout>
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/my-hotel-bookings" // New route for hotel owner bookings
+          element={(
+            <ProtectedRoute allowedRoles={["hotel-owner"]}>
+              <Layout>
+                <MyHotelBookings />
+              </Layout>
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/my-bookings"
+          element={(
+            <ProtectedRoute allowedRoles={["guest"]}>
+              <Layout>
+                <MyBookings />
+              </Layout>
+            </ProtectedRoute>
+          )}
+        />
+
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
@@ -115,3 +132,4 @@ const App = () => {
 };
 
 export default App;
+

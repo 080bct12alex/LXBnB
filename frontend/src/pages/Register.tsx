@@ -1,30 +1,33 @@
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "react-query";
+import { Link, useNavigate } from "react-router-dom";
 import * as apiClient from "../api-client";
 import { useAppContext } from "../contexts/AppContext";
-import { useNavigate } from "react-router-dom";
 
-export type RegisterFormData = {
-  firstName: string;
-  lastName: string;
+type RegisterFormData = {
   email: string;
   password: string;
   confirmPassword: string;
+  firstName: string;
+  lastName: string;
+  role: "guest" | "hotel-owner"; // Add role to form data
 };
 
 const Register = () => {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const { showToast } = useAppContext();
+  const navigate = useNavigate();
 
   const {
     register,
-    watch,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<RegisterFormData>();
 
-  const mutation = useMutation(apiClient.register, {
+  const password = watch("password");
+
+  const { mutate, isLoading } = useMutation(apiClient.register, {
     onSuccess: async () => {
       showToast({ message: "Registration Success!", type: "SUCCESS" });
       await queryClient.invalidateQueries("validateToken");
@@ -36,7 +39,7 @@ const Register = () => {
   });
 
   const onSubmit = handleSubmit((data) => {
-    mutation.mutate(data);
+    mutate(data);
   });
 
   return (
@@ -101,9 +104,10 @@ const Register = () => {
             validate: (val) => {
               if (!val) {
                 return "This field is required";
-              } else if (watch("password") !== val) {
-                return "Your passwords do no match";
+              } else if (val !== password) {
+                return "Your passwords do not match";
               }
+              return true;
             },
           })}
         ></input>
@@ -111,14 +115,41 @@ const Register = () => {
           <span className="text-red-500">{errors.confirmPassword.message}</span>
         )}
       </label>
-      <span>
-        <button
-          type="submit"
-          className="bg-blue-600 text-white p-2 font-bold hover:bg-blue-500 text-xl"
-        >
-          Create Account
-        </button>
-      </span>
+
+      {/* Role Selection */}
+      <div className="flex flex-col gap-2">
+        <span className="text-gray-700 text-sm font-bold">Register as:</span>
+        <div className="flex gap-4">
+          <label className="flex items-center gap-1">
+            <input
+              type="radio"
+              value="guest"
+              {...register("role", { required: "Please select a role" })}
+              defaultChecked // Default to guest
+            />
+            Guest
+          </label>
+          <label className="flex items-center gap-1">
+            <input
+              type="radio"
+              value="hotel-owner"
+              {...register("role", { required: "Please select a role" })}
+            />
+            Hotel Owner
+          </label>
+        </div>
+        {errors.role && (
+          <span className="text-red-500">{errors.role.message}</span>
+        )}
+      </div>
+
+      <button
+        type="submit"
+        className="bg-blue-600 text-white p-2 font-bold hover:bg-blue-500 text-xl disabled:bg-gray-400"
+        disabled={isLoading}
+      >
+        {isLoading ? "Registering..." : "Create Account"}
+      </button>
     </form>
   );
 };

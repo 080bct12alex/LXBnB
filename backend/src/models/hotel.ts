@@ -5,8 +5,7 @@ const bookingSchema = new mongoose.Schema<BookingType>({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   email: { type: String, required: true },
-  adultCount: { type: Number, required: true },
-  childCount: { type: Number, required: true },
+  roomsBooked: { type: Number, required: true }, // New field
   checkIn: { type: Date, required: true },
   checkOut: { type: Date, required: true },
   userId: { type: String, required: true },
@@ -20,8 +19,8 @@ const hotelSchema = new mongoose.Schema<HotelType>({
   country: { type: String, required: true },
   description: { type: String, required: true },
   type: { type: String, required: true },
-  adultCount: { type: Number, required: true },
-  childCount: { type: Number, required: true },
+  bedsPerRoom: { type: Number, required: true, min: 1 }, // New field
+  numberOfRooms: { type: Number, required: true, min: 1 },// New field
   facilities: [{ type: String, required: true }],
   pricePerNight: { type: Number, required: true },
   starRating: { type: Number, required: true, min: 1, max: 5 },

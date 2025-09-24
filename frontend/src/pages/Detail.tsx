@@ -3,9 +3,11 @@ import { useParams } from "react-router-dom";
 import * as apiClient from "./../api-client";
 import { AiFillStar } from "react-icons/ai";
 import GuestInfoForm from "../forms/GuestInfoForm/GuestInfoForm";
+import { useSearchContext } from "../contexts/SearchContext";
 
 const Detail = () => {
   const { hotelId } = useParams();
+  const search = useSearchContext();
 
   const { data: hotel } = useQuery(
     "fetchHotelById",
@@ -15,7 +17,21 @@ const Detail = () => {
     }
   );
 
-  if (!hotel) {
+  const { data: availabilityData, isLoading: isAvailabilityLoading } = useQuery(
+    ["checkHotelAvailability", hotelId, search.checkIn, search.checkOut, 1], // Assuming 1 room for now
+    () =>
+      apiClient.checkHotelAvailability(
+        hotelId as string,
+        search.checkIn as Date,
+        search.checkOut as Date,
+        1 // Assuming 1 room for now
+      ),
+    {
+      enabled: !!hotelId && !!search.checkIn && !!search.checkOut,
+    }
+  );
+
+  if (!hotel || isAvailabilityLoading) {
     return <></>;
   }
 
@@ -56,6 +72,7 @@ const Detail = () => {
           <GuestInfoForm
             pricePerNight={hotel.pricePerNight}
             hotelId={hotel._id}
+            availabilityData={availabilityData}
           />
         </div>
       </div>

@@ -21,7 +21,7 @@ const Booking = () => {
         Math.abs(search.checkOut.getTime() - search.checkIn.getTime()) /
         (1000 * 60 * 60 * 24);
 
-      setNumberOfNights(Math.ceil(nights));
+      setNumberOfNights(Math.max(1, Math.ceil(nights))); // Ensure minimum 1 night
     }
   }, [search.checkIn, search.checkOut]);
 
@@ -50,7 +50,22 @@ const Booking = () => {
     apiClient.fetchCurrentUser
   );
 
-  if (!hotel) {
+  // New availability check
+  const { data: availabilityData, isLoading: isAvailabilityLoading } = useQuery(
+    ["checkHotelAvailability", hotelId, search.checkIn, search.checkOut],
+    () =>
+      apiClient.checkHotelAvailability(
+        hotelId as string,
+        search.checkIn as Date,
+        search.checkOut as Date,
+        1 // Assuming 1 room for now, will be updated from GuestInfoForm
+      ),
+    {
+      enabled: !!hotelId && !!search.checkIn && !!search.checkOut,
+    }
+  );
+
+  if (!hotel || isAvailabilityLoading) {
     return <></>;
   }
 
@@ -59,12 +74,10 @@ const Booking = () => {
       <BookingDetailsSummary
         checkIn={search.checkIn}
         checkOut={search.checkOut}
-        adultCount={search.adultCount}
-        childCount={search.childCount}
         numberOfNights={numberOfNights}
         hotel={hotel}
       />
-      {currentUser && paymentIntentData && (
+      {currentUser && paymentIntentData && availabilityData?.isAvailable ? (
         <Elements
           stripe={stripePromise}
           options={{
@@ -76,6 +89,11 @@ const Booking = () => {
             paymentIntent={paymentIntentData}
           />
         </Elements>
+      ) : ( 
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">Oops!</strong>
+          <span className="block sm:inline"> {availabilityData?.message || "Hotel is not available for the selected dates."}</span>
+        </div>
       )}
     </div>
   );

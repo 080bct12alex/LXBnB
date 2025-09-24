@@ -5,7 +5,7 @@ import { useState } from "react";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 
 const Header = () => {
-  const { isLoggedIn } = useAppContext();
+  const { isLoggedIn, currentUser } = useAppContext(); // Get currentUser
   const [nav, setNav] = useState(false);
 
   const handleNav = () => {
@@ -24,12 +24,22 @@ const Header = () => {
               <li className="text-primary font-bold hover:text-secondary transition-colors duration-300">
                 <Link to="/">Home</Link>
               </li>
-              <li className="text-primary font-bold hover:text-secondary transition-colors duration-300">
-                <Link to="/my-bookings">My Bookings</Link>
-              </li>
-              <li className="text-primary font-bold hover:text-secondary transition-colors duration-300">
-                <Link to="/my-hotels">My Hotels</Link>
-              </li>
+              {currentUser?.role === "guest" && ( // Only show My Bookings for guests
+                <li className="text-primary font-bold hover:text-secondary transition-colors duration-300">
+                  <Link to="/my-bookings">My Bookings</Link>
+                </li>
+              )}
+              {currentUser?.role === "hotel-owner" && ( // Only show My Hotel Bookings for hotel owners
+                <>
+                  <li className="text-primary font-bold hover:text-secondary transition-colors duration-300">
+                    <Link to="/my-hotels">My Hotels</Link>
+                  </li>
+                 
+                  <li className="text-primary font-bold hover:text-secondary transition-colors duration-300">
+                    <Link to="/my-hotel-bookings">My Hotel Bookings</Link>
+                  </li>
+                </>
+              )}
               <li>
                 <SignOutButton />
               </li>
@@ -51,7 +61,7 @@ const Header = () => {
           )}
         </div>
         <div
-          className={ 
+          className={
             nav
               ? "overflow-y-hidden md:hidden ease-in duration-300 absolute text-primary left-0 top-0 w-full h-screen bg-background/90 px-4 py-7 flex flex-col"
               : "absolute top-0 h-screen left-[-100%] ease-in duration-500"
@@ -60,28 +70,40 @@ const Header = () => {
           <ul className="h-full w-full text-center pt-12">
             {isLoggedIn ? (
               <>
-              <li className="text-2xl py-8">
-                <Link to="/">Home</Link>
-              </li>
-              <li className="text-2xl py-8">
-                <Link to="/my-bookings">My Bookings</Link>
-              </li>
-              <li className="text-2xl py-8">
-                <Link to="/my-hotels">My Hotels</Link>
-              </li>
-              <li className="text-2xl py-8">
-                <SignOutButton />
-              </li>
-            </>
+                <li className="text-2xl py-8">
+                  <Link to="/">Home</Link>
+                </li>
+                {currentUser?.role === "guest" && (
+                  <li className="text-2xl py-8">
+                    <Link to="/my-bookings">My Bookings</Link>
+                  </li>
+                )}
+                {currentUser?.role === "hotel-owner" && (
+                  <> 
+                    <li className="text-2xl py-8">
+                      <Link to="/my-hotels">My Hotels</Link>
+                    </li>
+                    <li className="text-2xl py-8">
+                      <Link to="/add-hotel">Add Hotel</Link>
+                    </li>
+                    <li className="text-2xl py-8">
+                      <Link to="/my-hotel-bookings">My Hotel Bookings</Link>
+                    </li>
+                  </>
+                )}
+                <li className="text-2xl py-8">
+                  <SignOutButton />
+                </li>
+              </>
             ) : (
               <li className="text-2xl py-8">
-              <Link
-              to="/sign-in"
-              className="bg-secondary text-white px-4 py-2 rounded-md font-bold hover:bg-opacity-90 transition-colors duration-300"
-            >
-              Sign In
-            </Link>
-            </li>
+                <Link
+                  to="/sign-in"
+                  className="bg-secondary text-white px-4 py-2 rounded-md font-bold hover:bg-opacity-90 transition-colors duration-300"
+                >
+                  Sign In
+                </Link>
+              </li>
             )}
           </ul>
         </div>

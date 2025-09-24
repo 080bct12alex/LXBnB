@@ -173,22 +173,92 @@ router.post(
         userId: req.userId,
       };
 
-      const hotel = await Hotel.findOneAndUpdate(
+      // --- Hotel Availability Check ---
+      const hotel = await Hotel.findById(req.params.hotelId);
+
+      if (!hotel) {
+        return res.status(400).json({ message: "Hotel not found" });
+      }
+
+      const newBookingCheckIn = new Date(newBooking.checkIn);
+      const newBookingCheckOut = new Date(newBooking.checkOut);
+
+      const overlappingBookings = hotel.bookings.filter((booking) => {
+        const existingCheckIn = new Date(booking.checkIn);
+        const existingCheckOut = new Date(booking.checkOut);
+
+        return (
+          (newBookingCheckIn < existingCheckOut && newBookingCheckOut > existingCheckIn)
+        );
+      });
+
+      const totalRoomsBooked = overlappingBookings.reduce((total, booking) => {
+        return total + booking.roomsBooked;
+      }, 0);
+
+      if (totalRoomsBooked + newBooking.roomsBooked > hotel.numberOfRooms) {
+        return res.status(400).json({ message: "Hotel is fully booked for the selected dates." });
+      }
+      // --- End Availability Check ---
+
+      const updatedHotel = await Hotel.findOneAndUpdate(
         { _id: req.params.hotelId },
         {
           $push: { bookings: newBooking },
-        }
+        },
+        { new: true } // Return the updated document
       );
 
-      if (!hotel) {
+      if (!updatedHotel) {
         return res.status(400).json({ message: "hotel not found" });
       }
 
-      await hotel.save();
       res.status(200).send();
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: "something went wrong" });
+    }
+  }
+);
+
+router.get(
+  "/:hotelId/availability",
+  async (req: Request, res: Response) => {
+    try {
+      const hotelId = req.params.hotelId;
+      const checkIn = new Date(req.query.checkIn as string);
+      const checkOut = new Date(req.query.checkOut as string);
+      const rooms = parseInt(req.query.rooms as string);
+
+      const hotel = await Hotel.findById(hotelId);
+
+      if (!hotel) {
+        return res.status(400).json({ message: "Hotel not found" });
+      }
+
+      const overlappingBookings = hotel.bookings.filter((booking) => {
+        const existingCheckIn = new Date(booking.checkIn);
+        const existingCheckOut = new Date(booking.checkOut);
+
+        return (
+          (checkIn < existingCheckOut && checkOut > existingCheckIn)
+        );
+      });
+
+      const totalRoomsBooked = overlappingBookings.reduce((total, booking) => {
+        return total + booking.roomsBooked;
+      }, 0);
+
+      const remainingRooms = hotel.numberOfRooms - totalRoomsBooked;
+
+      if (remainingRooms < rooms) {
+        return res.status(200).json({ isAvailable: false, message: `Only ${remainingRooms} rooms available.` });
+      }
+
+      res.status(200).json({ isAvailable: true, message: "Hotel is available.", remainingRooms });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Error checking availability" });
     }
   }
 );
@@ -201,18 +271,6 @@ const constructSearchQuery = (queryParams: any) => {
       { city: new RegExp(queryParams.destination, "i") },
       { country: new RegExp(queryParams.destination, "i") },
     ];
-  }
-
-  if (queryParams.adultCount) {
-    constructedQuery.adultCount = {
-      $gte: parseInt(queryParams.adultCount),
-    };
-  }
-
-  if (queryParams.childCount) {
-    constructedQuery.childCount = {
-      $gte: parseInt(queryParams.childCount),
-    };
   }
 
   if (queryParams.facilities) {

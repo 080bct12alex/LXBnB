@@ -70,6 +70,36 @@ const DetailsSection = () => {
         )}
       </label>
       <label className="text-gray-700 text-sm font-bold max-w-[50%]">
+        Number of Rooms
+        <input
+          type="number"
+          min={1}
+          className="border rounded w-full py-1 px-2 font-normal"
+          {...register("numberOfRooms", {
+            required: "This field is required",
+            min: { value: 1, message: "Number of rooms must be at least 1" },
+          })}
+        ></input>
+        {errors.numberOfRooms && (
+          <span className="text-red-500">{errors.numberOfRooms.message}</span>
+        )}
+      </label>
+      <label className="text-gray-700 text-sm font-bold max-w-[50%]">
+        Beds Per Room
+        <input
+          type="number"
+          min={1}
+          className="border rounded w-full py-1 px-2 font-normal"
+          {...register("bedsPerRoom", {
+            required: "This field is required",
+            min: { value: 1, message: "Beds per room must be at least 1" },
+          })}
+        ></input>
+        {errors.bedsPerRoom && (
+          <span className="text-red-500">{errors.bedsPerRoom.message}</span>
+        )}
+      </label>
+      <label className="text-gray-700 text-sm font-bold max-w-[50%]">
         Star Rating
         <select
           {...register("starRating", {

@@ -4,6 +4,7 @@ export type UserType = {
   password: string;
   firstName: string;
   lastName: string;
+  role: "guest" | "hotel-owner";
 };
 
 export type HotelType = {
@@ -14,8 +15,8 @@ export type HotelType = {
   country: string;
   description: string;
   type: string;
-  adultCount: number;
-  childCount: number;
+  bedsPerRoom: number; // New field
+  numberOfRooms: number;
   facilities: string[];
   pricePerNight: number;
   starRating: number;
@@ -30,8 +31,7 @@ export type BookingType = {
   firstName: string;
   lastName: string;
   email: string;
-  adultCount: number;
-  childCount: number;
+  roomsBooked: number;
   checkIn: Date;
   checkOut: Date;
   totalCost: number;

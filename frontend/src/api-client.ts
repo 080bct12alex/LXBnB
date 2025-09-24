@@ -5,9 +5,18 @@ import {
   HotelType,
   PaymentIntentResponse,
   UserType,
+  BookingType,
 } from "../../backend/src/shared/types";
 import { BookingFormData } from "./forms/BookingForm/BookingForm";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+
+export type HotelBookingType = BookingType & { hotelName: string }; // New type for hotel owner bookings
+
+export type AvailabilityResponse = {
+  isAvailable: boolean;
+  message: string;
+  remainingRooms: number; // New field
+};
 
 export const fetchCurrentUser = async (): Promise<UserType> => {
   const response = await fetch(`${API_BASE_URL}/api/users/me`, {
@@ -135,8 +144,6 @@ export type SearchParams = {
   destination?: string;
   checkIn?: string;
   checkOut?: string;
-  adultCount?: string;
-  childCount?: string;
   page?: string;
   facilities?: string[];
   types?: string[];
@@ -152,8 +159,6 @@ export const searchHotels = async (
   queryParams.append("destination", searchParams.destination || "");
   queryParams.append("checkIn", searchParams.checkIn || "");
   queryParams.append("checkOut", searchParams.checkOut || "");
-  queryParams.append("adultCount", searchParams.adultCount || "");
-  queryParams.append("childCount", searchParams.childCount || "");
   queryParams.append("page", searchParams.page || "");
 
   queryParams.append("maxPrice", searchParams.maxPrice || "");
@@ -242,6 +247,40 @@ export const fetchMyBookings = async (): Promise<HotelType[]> => {
 
   if (!response.ok) {
     throw new Error("Unable to fetch bookings");
+  }
+
+  return response.json();
+};
+
+export const fetchMyHotelBookings = async (): Promise<HotelBookingType[]> => {
+  const response = await fetch(`${API_BASE_URL}/api/my-hotels/bookings`, {
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error("Unable to fetch hotel bookings");
+  }
+
+  return response.json();
+};
+
+export const checkHotelAvailability = async (
+  hotelId: string,
+  checkIn: Date,
+  checkOut: Date,
+  rooms: number
+): Promise<AvailabilityResponse> => {
+  const queryParams = new URLSearchParams();
+  queryParams.append("checkIn", checkIn.toISOString());
+  queryParams.append("checkOut", checkOut.toISOString());
+  queryParams.append("rooms", rooms.toString());
+
+  const response = await fetch(
+    `${API_BASE_URL}/api/hotels/${hotelId}/availability?${queryParams.toString()}`
+  );
+
+  if (!response.ok) {
+    throw new Error("Error checking hotel availability");
   }
 
   return response.json();

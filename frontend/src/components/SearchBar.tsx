@@ -12,17 +12,16 @@ const SearchBar = () => {
   const [destination, setDestination] = useState<string>(search.destination);
   const [checkIn, setCheckIn] = useState<Date>(search.checkIn);
   const [checkOut, setCheckOut] = useState<Date>(search.checkOut);
-  const [adultCount, setAdultCount] = useState<number>(search.adultCount);
-  const [childCount, setChildCount] = useState<number>(search.childCount);
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
+    if (!destination) {
+      return;
+    }
     search.saveSearchValues(
       destination,
       checkIn,
-      checkOut,
-      adultCount,
-      childCount
+      checkOut
     );
     navigate("/search");
   };
@@ -31,8 +30,6 @@ const SearchBar = () => {
     setDestination("");
     setCheckIn(new Date());
     setCheckOut(new Date());
-    setAdultCount(1);
-    setChildCount(0);
   };
 
   const minDate = new Date();
@@ -54,37 +51,19 @@ const SearchBar = () => {
         />
       </div>
 
-      <div className="flex items-center bg-gray-100 p-2 rounded-lg col-span-1">
-        <label className="items-center flex w-1/2">
-          Adults:
-          <input
-            className="w-full p-1 focus:outline-none font-bold bg-transparent"
-            type="number"
-            min={1}
-            max={20}
-            value={adultCount}
-            onChange={(event) => setAdultCount(parseInt(event.target.value))}
-          />
-        </label>
-        <label className="items-center flex w-1/2">
-          Children:
-          <input
-            className="w-full p-1 focus:outline-none font-bold bg-transparent"
-            type="number"
-            min={0}
-            max={20}
-            value={childCount}
-            onChange={(event) => setChildCount(parseInt(event.target.value))}
-          />
-        </label>
-      </div>
       <div className="col-span-1 sm:col-span-2 lg:col-span-1">
         <DatePicker
           selected={checkIn}
           onChange={(dates) => {
             const [start, end] = dates as [Date, Date];
             setCheckIn(start);
-            setCheckOut(end);
+            if (end && end.getTime() === start.getTime()) {
+              const nextDay = new Date(start);
+              nextDay.setDate(start.getDate() + 1);
+              setCheckOut(nextDay);
+            } else {
+              setCheckOut(end);
+            }
           }}
           selectsRange
           startDate={checkIn}

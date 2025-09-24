@@ -48,10 +48,7 @@ const MyHotels = () => {
               <div className="border border-slate-300 rounded-sm p-3 flex items-center">
                 <BiMoney className="mr-1" />£{hotel.pricePerNight} per night
               </div>
-              <div className="border border-slate-300 rounded-sm p-3 flex items-center">
-                <BiHotel className="mr-1" />
-                {hotel.adultCount} adults, {hotel.childCount} children
-              </div>
+             
               <div className="border border-slate-300 rounded-sm p-3 flex items-center">
                 <BiStar className="mr-1" />
                 {hotel.starRating} Star Rating

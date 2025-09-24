@@ -3,6 +3,7 @@ import Toast from "../components/Toast";
 import { useQuery } from "react-query";
 import * as apiClient from "../api-client";
 import { loadStripe, Stripe } from "@stripe/stripe-js";
+import { UserType } from "../../backend/src/shared/types"; // Import UserType
 
 const STRIPE_PUB_KEY = import.meta.env.VITE_STRIPE_PUB_KEY || "";
 
@@ -15,6 +16,7 @@ type AppContext = {
   showToast: (toastMessage: ToastMessage) => void;
   isLoggedIn: boolean;
   stripePromise: Promise<Stripe | null>;
+  currentUser?: UserType; // Add currentUser to AppContext
 };
 
 const AppContext = React.createContext<AppContext | undefined>(undefined);
@@ -32,6 +34,15 @@ export const AppContextProvider = ({
     retry: false,
   });
 
+  const { data: currentUser } = useQuery(
+    "fetchCurrentUser",
+    apiClient.fetchCurrentUser,
+    {
+      retry: false,
+      enabled: !isError, // Only fetch user if logged in
+    }
+  );
+
   return (
     <AppContext.Provider
       value={{
@@ -40,6 +51,7 @@ export const AppContextProvider = ({
         },
         isLoggedIn: !isError,
         stripePromise,
+        currentUser, // Provide currentUser
       }}
     >
       {toast && (

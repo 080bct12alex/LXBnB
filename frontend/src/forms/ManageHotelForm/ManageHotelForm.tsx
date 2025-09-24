@@ -2,7 +2,6 @@ import { FormProvider, useForm } from "react-hook-form";
 import DetailsSection from "./DetailsSection";
 import TypeSection from "./TypeSection";
 import FacilitiesSection from "./FacilitiesSection";
-import GuestsSection from "./GuestsSection";
 import ImagesSection from "./ImagesSection";
 import { HotelType } from "../../../../backend/src/shared/types";
 import { useEffect } from "react";
@@ -15,11 +14,11 @@ export type HotelFormData = {
   type: string;
   pricePerNight: number;
   starRating: number;
+  numberOfRooms: number;
+  bedsPerRoom: number; // Add bedsPerRoom
   facilities: string[];
   imageFiles: FileList;
   imageUrls: string[];
-  adultCount: number;
-  childCount: number;
 };
 
 type Props = {
@@ -48,8 +47,8 @@ const ManageHotelForm = ({ onSave, isLoading, hotel }: Props) => {
     formData.append("type", formDataJson.type);
     formData.append("pricePerNight", formDataJson.pricePerNight.toString());
     formData.append("starRating", formDataJson.starRating.toString());
-    formData.append("adultCount", formDataJson.adultCount.toString());
-    formData.append("childCount", formDataJson.childCount.toString());
+    formData.append("numberOfRooms", formDataJson.numberOfRooms.toString());
+    formData.append("bedsPerRoom", formDataJson.bedsPerRoom.toString()); // Add bedsPerRoom
 
     formDataJson.facilities.forEach((facility, index) => {
       formData.append(`facilities[${index}]`, facility);
@@ -61,9 +60,11 @@ const ManageHotelForm = ({ onSave, isLoading, hotel }: Props) => {
       });
     }
 
-    Array.from(formDataJson.imageFiles).forEach((imageFile) => {
-      formData.append(`imageFiles`, imageFile);
-    });
+    if (formDataJson.imageFiles && formDataJson.imageFiles.length > 0) {
+      Array.from(formDataJson.imageFiles).forEach((imageFile) => {
+        formData.append(`imageFiles`, imageFile);
+      });
+    }
 
     onSave(formData);
   });
@@ -74,7 +75,6 @@ const ManageHotelForm = ({ onSave, isLoading, hotel }: Props) => {
         <DetailsSection />
         <TypeSection />
         <FacilitiesSection />
-        <GuestsSection />
         <ImagesSection />
         <span className="flex justify-end">
           <button

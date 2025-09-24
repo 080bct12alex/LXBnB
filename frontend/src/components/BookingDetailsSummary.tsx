@@ -3,8 +3,6 @@ import { HotelType } from "../../../backend/src/shared/types";
 type Props = {
   checkIn: Date;
   checkOut: Date;
-  adultCount: number;
-  childCount: number;
   numberOfNights: number;
   hotel: HotelType;
 };
@@ -12,8 +10,6 @@ type Props = {
 const BookingDetailsSummary = ({
   checkIn,
   checkOut,
-  adultCount,
-  childCount,
   numberOfNights,
   hotel,
 }: Props) => {
@@ -37,13 +33,6 @@ const BookingDetailsSummary = ({
       <div className="border-t border-b py-2">
         Total length of stay:
         <div className="font-bold">{numberOfNights} nights</div>
-      </div>
-
-      <div>
-        Guests{" "}
-        <div className="font-bold">
-          {adultCount} adults & {childCount} children
-        </div>
       </div>
     </div>
   );

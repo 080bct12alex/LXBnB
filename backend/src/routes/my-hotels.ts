@@ -33,6 +33,18 @@ router.post(
       .notEmpty()
       .isArray()
       .withMessage("Facilities are required"),
+    body("numberOfRooms")
+      .notEmpty()
+      .isNumeric()
+      .withMessage("Number of rooms is required and must be a number")
+      .isInt({ min: 1 })
+      .withMessage("Number of rooms must be at least 1"),
+    body("bedsPerRoom") // Add validation for bedsPerRoom
+      .notEmpty()
+      .isNumeric()
+      .withMessage("Beds per room is required and must be a number")
+      .isInt({ min: 1 })
+      .withMessage("Beds per room must be at least 1"),
   ],
   upload.array("imageFiles", 6),
   async (req: Request, res: Response) => {
@@ -45,6 +57,8 @@ router.post(
       newHotel.imageUrls = imageUrls;
       newHotel.lastUpdated = new Date();
       newHotel.userId = req.userId;
+      newHotel.numberOfRooms = parseInt(req.body.numberOfRooms);
+      newHotel.bedsPerRoom = parseInt(req.body.bedsPerRoom);
 
       const hotel = new Hotel(newHotel);
       await hotel.save();
@@ -60,9 +74,32 @@ router.post(
 router.get("/", verifyToken, async (req: Request, res: Response) => {
   try {
     const hotels = await Hotel.find({ userId: req.userId });
-    res.json(hotels);
+    res.json(hotels.map((hotel) => hotel.toObject()));
   } catch (error) {
     res.status(500).json({ message: "Error fetching hotels" });
+  }
+});
+
+router.get("/bookings", verifyToken, async (req: Request, res: Response) => {
+  try {
+    const hotels = await Hotel.find({
+      userId: req.userId,
+    });
+
+    const hotelBookings = hotels.map((hotel) => {
+      const bookingsWithHotel = hotel.bookings.map((booking) => {
+        return {
+          ...(booking as any).toObject(),
+          hotelName: hotel.name,
+        };
+      });
+      return bookingsWithHotel;
+    }).flat();
+
+    res.status(200).json(hotelBookings);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Unable to fetch bookings" });
   }
 });
 
@@ -85,12 +122,18 @@ router.put(
   upload.array("imageFiles"),
   async (req: Request, res: Response) => {
     try {
+      const hotelId = req.params.hotelId;
       const updatedHotel: HotelType = req.body;
       updatedHotel.lastUpdated = new Date();
+      updatedHotel.numberOfRooms = parseInt(req.body.numberOfRooms);
+      updatedHotel.bedsPerRoom = parseInt(req.body.bedsPerRoom);
+      updatedHotel.pricePerNight = parseFloat(req.body.pricePerNight);
+      updatedHotel.starRating = parseInt(req.body.starRating);
+      updatedHotel.facilities = req.body.facilities;
 
       const hotel = await Hotel.findOneAndUpdate(
         {
-          _id: req.params.hotelId,
+          _id: hotelId,
           userId: req.userId,
         },
         updatedHotel,
@@ -101,18 +144,19 @@ router.put(
         return res.status(404).json({ message: "Hotel not found" });
       }
 
-      const files = req.files as Express.Multer.File[];
-      const updatedImageUrls = await uploadImages(files);
+      const newImageFiles = req.files as Express.Multer.File[];
+      const updatedImageUrls = await uploadImages(newImageFiles);
 
       hotel.imageUrls = [
         ...updatedImageUrls,
-        ...(updatedHotel.imageUrls || []),
+        ...(req.body.imageUrls || []),
       ];
 
       await hotel.save();
       res.status(201).json(hotel);
     } catch (error) {
-      res.status(500).json({ message: "Something went throw" });
+      console.error(error);
+      res.status(500).json({ message: "Something went wrong" });
     }
   }
 );

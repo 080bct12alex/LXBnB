@@ -39,9 +39,9 @@ const MyBookings = () => {
                   </span>
                 </div>
                 <div>
-                  <span className="font-bold mr-2">Guests:</span>
+                  <span className="font-bold mr-2">Rooms:</span>
                   <span>
-                    {booking.adultCount} adults, {booking.childCount} children
+                    {booking.roomsBooked} rooms
                   </span>
                 </div>
               </div>

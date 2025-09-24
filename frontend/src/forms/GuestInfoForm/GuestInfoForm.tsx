@@ -3,20 +3,21 @@ import DatePicker from "react-datepicker";
 import { useSearchContext } from "../../contexts/SearchContext";
 import { useAppContext } from "../../contexts/AppContext";
 import { useLocation, useNavigate } from "react-router-dom";
+import { AvailabilityResponse } from "../../api-client";
 
 type Props = {
   hotelId: string;
   pricePerNight: number;
+  availabilityData?: AvailabilityResponse;
 };
 
 type GuestInfoFormData = {
   checkIn: Date;
   checkOut: Date;
-  adultCount: number;
-  childCount: number;
+  rooms: number;
 };
 
-const GuestInfoForm = ({ hotelId, pricePerNight }: Props) => {
+const GuestInfoForm = ({ hotelId, pricePerNight, availabilityData }: Props) => {
   const search = useSearchContext();
   const { isLoggedIn } = useAppContext();
   const navigate = useNavigate();
@@ -32,13 +33,13 @@ const GuestInfoForm = ({ hotelId, pricePerNight }: Props) => {
     defaultValues: {
       checkIn: search.checkIn,
       checkOut: search.checkOut,
-      adultCount: search.adultCount,
-      childCount: search.childCount,
+      rooms: 1,
     },
   });
 
   const checkIn = watch("checkIn");
   const checkOut = watch("checkOut");
+  const rooms = watch("rooms");
 
   const minDate = new Date();
   const maxDate = new Date();
@@ -49,8 +50,7 @@ const GuestInfoForm = ({ hotelId, pricePerNight }: Props) => {
       "",
       data.checkIn,
       data.checkOut,
-      data.adultCount,
-      data.childCount
+      data.rooms
     );
     navigate("/sign-in", { state: { from: location } });
   };
@@ -60,11 +60,14 @@ const GuestInfoForm = ({ hotelId, pricePerNight }: Props) => {
       "",
       data.checkIn,
       data.checkOut,
-      data.adultCount,
-      data.childCount
+      data.rooms
     );
     navigate(`/hotel/${hotelId}/booking`);
   };
+
+  const isBookButtonDisabled = availabilityData && (
+    !availabilityData.isAvailable || rooms > availabilityData.remainingRooms
+  );
 
   return (
     <div className="flex flex-col p-4 bg-blue-200 gap-4">
@@ -79,7 +82,14 @@ const GuestInfoForm = ({ hotelId, pricePerNight }: Props) => {
             <DatePicker
               required
               selected={checkIn}
-              onChange={(date) => setValue("checkIn", date as Date)}
+              onChange={(date) => {
+                setValue("checkIn", date as Date);
+                if (checkOut && date && checkOut.getTime() === date.getTime()) {
+                  const nextDay = new Date(date);
+                  nextDay.setDate(date.getDate() + 1);
+                  setValue("checkOut", nextDay);
+                }
+              }}
               selectsStart
               startDate={checkIn}
               endDate={checkOut}
@@ -100,49 +110,45 @@ const GuestInfoForm = ({ hotelId, pricePerNight }: Props) => {
               endDate={checkOut}
               minDate={minDate}
               maxDate={maxDate}
-              placeholderText="Check-in Date"
+              placeholderText="Check-out Date"
               className="min-w-full bg-white p-2 focus:outline-none"
               wrapperClassName="min-w-full"
             />
           </div>
           <div className="flex bg-white px-2 py-1 gap-2">
             <label className="items-center flex">
-              Adults:
+              Rooms:
               <input
                 className="w-full p-1 focus:outline-none font-bold"
                 type="number"
                 min={1}
                 max={20}
-                {...register("adultCount", {
+                {...register("rooms", {
                   required: "This field is required",
                   min: {
                     value: 1,
-                    message: "There must be at least one adult",
+                    message: "There must be at least one room",
                   },
                   valueAsNumber: true,
                 })}
               />
             </label>
-            <label className="items-center flex">
-              Children:
-              <input
-                className="w-full p-1 focus:outline-none font-bold"
-                type="number"
-                min={0}
-                max={20}
-                {...register("childCount", {
-                  valueAsNumber: true,
-                })}
-              />
-            </label>
-            {errors.adultCount && (
+            {errors.rooms && (
               <span className="text-red-500 font-semibold text-sm">
-                {errors.adultCount.message}
+                {errors.rooms.message}
               </span>
             )}
           </div>
+          {availabilityData && (
+            <div className="text-md font-bold">
+              Rooms available: {availabilityData.remainingRooms}
+            </div>
+          )}
           {isLoggedIn ? (
-            <button className="bg-blue-600 text-white h-full p-2 font-bold hover:bg-blue-500 text-xl">
+            <button
+              disabled={isBookButtonDisabled}
+              className="bg-blue-600 text-white h-full p-2 font-bold hover:bg-blue-500 text-xl disabled:bg-gray-500"
+            >
               Book Now
             </button>
           ) : (
