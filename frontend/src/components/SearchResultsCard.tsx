@@ -7,11 +7,11 @@ type Props = {
 
 const SearchResultsCard = ({ hotel }: Props) => {
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-[2fr_3fr] border border-slate-300 rounded-lg p-8 gap-8">
+    <div className="grid grid-cols-1 xl:grid-cols-[2fr_3fr] border border-gray-200 rounded-lg p-8 gap-8 shadow-sm hover:shadow-lg transition-shadow duration-300">
       <div className="w-full h-[300px]">
         <img
           src={hotel.imageUrls[0]}
-          className="w-full h-full object-cover object-center"
+          className="w-full h-full object-cover object-center rounded-lg"
         />
       </div>
       <div className="grid grid-rows-[1fr_2fr_1fr]">
@@ -26,20 +26,20 @@ const SearchResultsCard = ({ hotel }: Props) => {
           </div>
           <Link
             to={`/detail/${hotel._id}`}
-            className="text-2xl font-bold cursor-pointer"
+            className="text-2xl font-bold cursor-pointer text-gray-800 hover:text-secondary transition-colors duration-300"
           >
             {hotel.name}
           </Link>
         </div>
 
         <div>
-          <div className="line-clamp-4">{hotel.description}</div>
+          <div className="line-clamp-4 text-gray-600">{hotel.description}</div>
         </div>
 
         <div className="grid grid-cols-2 items-end whitespace-nowrap">
           <div className="flex gap-1 items-center">
             {hotel.facilities.slice(0, 3).map((facility) => (
-              <span className="bg-slate-300 p-2 rounded-lg font-bold text-xs whitespace-nowrap">
+              <span className="bg-gray-200 p-2 rounded-lg font-bold text-xs whitespace-nowrap">
                 {facility}
               </span>
             ))}
@@ -52,7 +52,7 @@ const SearchResultsCard = ({ hotel }: Props) => {
             <span className="font-bold">£{hotel.pricePerNight} per night</span>
             <Link
               to={`/detail/${hotel._id}`}
-              className="bg-blue-600 text-white h-full p-2 font-bold text-xl max-w-fit hover:bg-blue-500"
+              className="bg-secondary text-white h-full p-2 font-bold text-xl max-w-fit rounded-md hover:bg-opacity-90 transition-colors duration-300"
             >
               View More
             </Link>

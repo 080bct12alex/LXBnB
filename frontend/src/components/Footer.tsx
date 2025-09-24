@@ -1,13 +1,13 @@
 const Footer = () => {
   return (
-    <div className="bg-primary py-10">
+    <div className="bg-accent py-6 mt-10">
       <div className="container mx-auto flex justify-between items-center">
-        <span className="text-3xl text-white font-bold tracking-tight">
+        <span className="text-3xl text-black font-bold tracking-tight">
           LXBNB
         </span>
-        <span className="text-white font-bold tracking-tight flex gap-4">
-          <p className="cursor-pointer">Privacy Policy</p>
-          <p className="cursor-pointer">Terms of Service</p>
+        <span className="text-black font-bold tracking-tight flex gap-4">
+          <p className="cursor-pointer hover:text-secondary transition-colors duration-300">Privacy Policy</p>
+          <p className="cursor-pointer hover:text-secondary transition-colors duration-300">Terms of Service</p>
         </span>
       </div>
     </div>

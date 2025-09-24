@@ -4,11 +4,10 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#05445E",
-        secondary: "#189AB4",
-        accent: "#75E6DA",
-        background: "#F9FAFB",
-        
+        primary: "#0B2B40",
+        secondary: "#D4AF37",
+        accent: "#F0F0F0",
+        background: "#FFFFFF",
       },
       fontFamily: {
         sans: ["Poppins", "sans-serif"],
@@ -16,7 +15,7 @@ export default {
     },
     container: {
       padding: {
-        md: "5 rem",
+        md: "10rem",
       },
     },
   },

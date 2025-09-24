@@ -5,10 +5,10 @@ type Props = {
 
 const PriceFilter = ({ selectedPrice, onChange }: Props) => {
   return (
-    <div>
+    <div className="border-b border-gray-200 pb-5">
       <h4 className="text-md font-semibold mb-2"> Max Price</h4>
       <select
-        className="p-2 border rounded-md w-full"
+        className="p-2 border rounded-md w-full bg-gray-100 focus:ring-secondary focus:border-secondary"
         value={selectedPrice}
         onChange={(event) =>
           onChange(
