@@ -26,6 +26,14 @@ const SearchBar = () => {
     );
     navigate("/search");
   };
+  
+  const handleClear = () => {
+    setDestination("");
+    setCheckIn(new Date());
+    setCheckOut(new Date());
+    setAdultCount(1);
+    setChildCount(0);
+  };
 
   const minDate = new Date();
   const maxDate = new Date();
@@ -34,9 +42,9 @@ const SearchBar = () => {
   return (
     <form 
       onSubmit={handleSubmit}
-      className="-mt-8 p-4 bg-white rounded-lg shadow-lg grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5 items-center gap-4"
+      className="-mt-8 p-4 bg-white rounded-lg shadow-lg grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5 items-center gap-4"
     >
-      <div className="flex items-center bg-gray-100 p-2 rounded-lg">
+      <div className="flex items-center bg-gray-100 p-2 rounded-lg col-span-1 sm:col-span-2 lg:col-span-1">
         <MdTravelExplore size={25} className="mr-2 text-gray-500" />
         <input
           placeholder="Where are you going?"
@@ -46,8 +54,8 @@ const SearchBar = () => {
         />
       </div>
 
-      <div className="flex items-center bg-gray-100 p-2 rounded-lg">
-        <label className="items-center flex">
+      <div className="flex items-center bg-gray-100 p-2 rounded-lg col-span-1">
+        <label className="items-center flex w-1/2">
           Adults:
           <input
             className="w-full p-1 focus:outline-none font-bold bg-transparent"
@@ -58,7 +66,7 @@ const SearchBar = () => {
             onChange={(event) => setAdultCount(parseInt(event.target.value))}
           />
         </label>
-        <label className="items-center flex">
+        <label className="items-center flex w-1/2">
           Children:
           <input
             className="w-full p-1 focus:outline-none font-bold bg-transparent"
@@ -70,39 +78,29 @@ const SearchBar = () => {
           />
         </label>
       </div>
-      <div className="w-full">
+      <div className="col-span-1 sm:col-span-2 lg:col-span-1">
         <DatePicker
           selected={checkIn}
-          onChange={(date) => setCheckIn(date as Date)}
-          selectsStart
+          onChange={(dates) => {
+            const [start, end] = dates as [Date, Date];
+            setCheckIn(start);
+            setCheckOut(end);
+          }}
+          selectsRange
           startDate={checkIn}
           endDate={checkOut}
           minDate={minDate}
           maxDate={maxDate}
-          placeholderText="Check-in Date"
-          className="min-w-full bg-gray-100 p-2 focus:outline-none rounded-lg"
-          wrapperClassName="min-w-full"
+          placeholderText="Check-in - Check-out"
+          className="w-full bg-gray-100 p-2 focus:outline-none rounded-lg"
+          wrapperClassName="w-full"
         />
       </div>
-      <div class="w-full">
-        <DatePicker
-          selected={checkOut}
-          onChange={(date) => setCheckOut(date as Date)}
-          selectsStart
-          startDate={checkIn}
-          endDate={checkOut}
-          minDate={minDate}
-          maxDate={maxDate}
-          placeholderText="Check-out Date"
-          className="min-w-full bg-gray-100 p-2 focus:outline-none rounded-lg"
-          wrapperClassName="min-w-full"
-        />
-      </div>
-      <div className="flex gap-2">
-        <button className="w-2/3 bg-secondary text-white h-full p-2 font-bold text-xl rounded-lg hover:bg-opacity-90 transition-colors duration-300">
+      <div className="flex gap-2 col-span-1">
+        <button className="w-1/2 bg-secondary text-white h-full p-2 font-bold text-xl rounded-lg hover:bg-opacity-90 transition-colors duration-300">
           Search
         </button>
-        <button className="w-1/3 bg-red-600 text-white h-full p-2 font-bold text-xl rounded-lg hover:bg-opacity-90 transition-colors duration-300">
+        <button type="button" onClick={handleClear} className="w-1/2 bg-red-600 text-white h-full p-2 font-bold text-xl rounded-lg hover:bg-opacity-90 transition-colors duration-300">
           Clear
         </button>
       </div>
