@@ -79,8 +79,4 @@ app.get("*", (req: Request, res: Response) => {
 });
 
 
-// Start the server at port 
-const PORT = process.env.PORT || 7000;  // Default to 7000 if not specified in environment
-app.listen(PORT, () => {
-  console.log(`Server running on localhost:${PORT}`);
-});
+module.exports = app;
