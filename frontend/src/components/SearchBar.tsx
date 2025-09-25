@@ -12,6 +12,7 @@ const SearchBar = () => {
   const [destination, setDestination] = useState<string>(search.destination);
   const [checkIn, setCheckIn] = useState<Date>(search.checkIn);
   const [checkOut, setCheckOut] = useState<Date>(search.checkOut);
+  const [rooms, setRooms] = useState<number>(search.rooms); // Initialize rooms state
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -21,7 +22,9 @@ const SearchBar = () => {
     search.saveSearchValues(
       destination,
       checkIn,
-      checkOut
+      checkOut,
+      rooms, // Pass rooms argument
+      undefined // Pass undefined for hotelId
     );
     navigate("/search");
   };
@@ -30,6 +33,7 @@ const SearchBar = () => {
     setDestination("");
     setCheckIn(new Date());
     setCheckOut(new Date());
+    setRooms(1); // Reset rooms on clear
   };
 
   const minDate = new Date();
