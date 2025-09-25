@@ -1,4 +1,4 @@
- {
+{
     "build": {
       "env": {
         "VITE_API_BASE_URL": ""
@@ -27,6 +27,12 @@
             "value": "X-Requested-With, Content-Type, Authorization"
           }
         ]
+      }
+    ],
+    "builds": [
+      {
+        "src": "backend/src/index.ts",
+        "use": "@vercel/node"
       }
     ]
   }
