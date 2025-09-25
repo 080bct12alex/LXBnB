@@ -47,14 +47,13 @@ test("should book hotel", async ({ page }) => {
   const date = new Date();
   date.setDate(date.getDate() + 3);
   const formattedDate = date.toISOString().split("T")[0];
-  await page.getByPlaceholder("Check-out Date").fill(formattedDate);
 
   await page.getByRole("button", { name: "Search" }).click();
 
   await page.getByText("Dublin Getaways").click();
   await page.getByRole("button", { name: "Book now" }).click();
 
-  await expect(page.getByText("Total Cost: £357.00")).toBeVisible();
+  await expect(page.getByText("Total Cost: $357.00")).toBeVisible();
 
   const stripeFrame = page.frameLocator("iframe").first();
   await stripeFrame

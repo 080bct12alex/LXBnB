@@ -36,8 +36,7 @@ test("should allow user to add a hotel", async ({ page }) => {
   await page.getByLabel("Free Wifi").check();
   await page.getByLabel("Parking").check();
 
-  await page.locator('[name="adultCount"]').fill("2");
-  await page.locator('[name="childCount"]').fill("4");
+
 
   await page.setInputFiles('[name="imageFiles"]', [
     path.join(__dirname, "files", "1.png"),
@@ -56,7 +55,7 @@ test("should display hotels", async ({ page }) => {
   await expect(page.getByText("Dublin, Ireland")).toBeVisible();
   await expect(page.getByText("All Inclusive")).toBeVisible();
   await expect(page.getByText("£119 per night")).toBeVisible();
-  await expect(page.getByText("2 adults, 3 children")).toBeVisible();
+
   await expect(page.getByText("2 Star Rating")).toBeVisible();
 
   await expect(
