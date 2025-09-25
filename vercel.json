@@ -33,7 +33,7 @@
       {
         "src": "frontend/",
         "use": "@vercel/static-build",
-        "config": { "distDir": "frontend/dist" }
+        "config": { "distDir": "dist" }
       },
       {
         "src": "backend/src/index.ts",
