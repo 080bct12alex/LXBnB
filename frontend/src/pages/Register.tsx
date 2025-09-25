@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import * as apiClient from "../api-client";
 import { useAppContext } from "../contexts/AppContext";
 
-type RegisterFormData = {
+export type RegisterFormData = {
   email: string;
   password: string;
   confirmPassword: string;
