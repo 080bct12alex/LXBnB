@@ -77,6 +77,10 @@ app.use("/api/my-bookings", bookingRoutes);
 app.get("*", (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
 });
+const PORT = process.env.PORT || 7000;
+app.listen(PORT, () => {
+  console.log(`Server is listening on port ${PORT}`);
+});
 
 
 module.exports = app;
