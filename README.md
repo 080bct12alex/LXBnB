@@ -1,5 +1,7 @@
 # LXBnb : A Hotel Booking App
 
+ #  🌐 [Live Website](https://travelcompanionai.onrender.com)
+
 ## Features:
 - User Authentication 
 - Role-Based Access Control 
