@@ -1,6 +1,6 @@
 # LXBnb : A Hotel Booking App
 
- #  🌐 [Live Website](https://travelcompanionai.onrender.com)
+ #  🌐 [Live Website](https://lxbnb.onrender.com)
 
 ## Features:
 - User Authentication 
